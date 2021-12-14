@@ -1,4 +1,6 @@
-﻿namespace Alura.LeilaoOnline.Core
+﻿using System;
+
+namespace Alura.LeilaoOnline.Core
 {
     public class Lance
     {
@@ -8,7 +10,7 @@
         public Lance(Interessada cliente, double valor)
         {
             Cliente = cliente;
-            Valor = valor;
+            Valor = valor >= 0 ? valor : throw new ArgumentException("Não é possível terminar o pregão sem que ele tenha começado. Para isso, utilize o método IniciaPregao().");
         }
     }
 }

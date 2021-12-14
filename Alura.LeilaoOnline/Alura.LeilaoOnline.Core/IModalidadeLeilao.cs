@@ -4,10 +4,8 @@ using System.Text;
 
 namespace Alura.LeilaoOnline.Core
 {
-    public enum EstadoDoLeilao
+    public interface IModalidadeLeilao
     {
-        LeilaoAnteDoPregao,
-        LeilaoEmAndamento,
-        LeilaoFinalizado
+        Lance ModalidadeLeilao(Leilao leilao);
     }
 }

@@ -13,12 +13,23 @@ namespace Alura.LeilaoOnline.Tests
         public void LeilaoComVariosLances(double valorEsperado, double[] ofertas)
         {
             //Arrange - cenário
-            var leilao = new Leilao("Van Gogh");
+            IModalidadeLeilao modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
             var fulano = new Interessada("Fulano", leilao);
+            var maria = new Interessada("Maria", leilao);
 
-            foreach (var valor in ofertas)
+            leilao.IniciaPregao();
+
+            for (int i = 0; i < ofertas.Length; i++)
             {
-                leilao.RecebeLance(fulano, valor);
+                if ((i % 2) == 0)
+                {
+                    leilao.RecebeLance(fulano, ofertas[i]);
+                }
+                else
+                {
+                    leilao.RecebeLance(maria, ofertas[i]);
+                }
             }
 
             //Act - método sob teste
@@ -27,16 +38,19 @@ namespace Alura.LeilaoOnline.Tests
             //Assert - teste
             var valorObtido = leilao.Ganhador.Valor;
 
-            Assert.Equal(valorEsperado, leilao.Ganhador.Valor);
+            Assert.Equal(valorEsperado, valorObtido);
         }
 
         [Fact]
         public void LeilaoComApenasUmLance()
         {
             //Arrange - cenário
-            var leilao = new Leilao("Van Gogh");
+            IModalidadeLeilao modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
             var fulano = new Interessada("Fulano", leilao);
             var maria = new Interessada("Maria", leilao);
+
+            leilao.IniciaPregao();
 
             leilao.RecebeLance(fulano, 777);
 
@@ -51,18 +65,55 @@ namespace Alura.LeilaoOnline.Tests
         }
 
         [Fact]
-        public void LeilaoSemLance()
+        public void RetornaZeroDadoLeilaoSemLances()
         {
             //Arrange - cenário
-            var leilao = new Leilao("Van Gogh");
+            IModalidadeLeilao modalidade = new MaiorValor();
+            var leilao = new Leilao("Van Gogh", modalidade);
             var fulano = new Interessada("Fulano", leilao);
             var maria = new Interessada("Maria", leilao);
+            leilao.IniciaPregao();
 
             //Act
             leilao.TerminaPregao();
 
             //Assert
             var valorEsperado = 0;
+            var valorObtido = leilao.Ganhador.Valor;
+
+            Assert.Equal(valorEsperado, valorObtido);
+        }
+
+        [Theory]
+        [InlineData(1200, 1250, new double[] { 800, 1150, 1400, 1250 })]
+        public void RetornaValorSuperiorMaisProximoDadoLeilaoNessaModalidade(double valorDestino,
+            double valorEsperado,
+            double[] ofertas)
+        {
+            //Arrange - cenário
+            IModalidadeLeilao modalidade = new OfertaSuperiorMaisProxima(valorDestino);
+            var leilao = new Leilao("Van Gogh", modalidade);
+            var fulano = new Interessada("Fulano", leilao);
+            var maria = new Interessada("Maria", leilao);
+
+            leilao.IniciaPregao();
+
+            for (int i = 0; i < ofertas.Length; i++)
+            {
+                if ((i % 2) == 0)
+                {
+                    leilao.RecebeLance(fulano, ofertas[i]);
+                }
+                else
+                {
+                    leilao.RecebeLance(maria, ofertas[i]);
+                }
+            }
+
+            //Act - método sob teste
+            leilao.TerminaPregao();
+
+            //Assert - teste
             var valorObtido = leilao.Ganhador.Valor;
 
             Assert.Equal(valorEsperado, valorObtido);
